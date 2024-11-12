@@ -398,6 +398,7 @@ import {
     TransformationResult,
     transformNodes,
     tryCast,
+    TryExpression,
     TryStatement,
     TupleTypeNode,
     TypeAliasDeclaration,
@@ -1948,6 +1949,8 @@ export function createPrinter(printerOptions: PrinterOptions = {}, handlers: Pri
                     return emitTypeOfExpression(node as TypeOfExpression);
                 case SyntaxKind.VoidExpression:
                     return emitVoidExpression(node as VoidExpression);
+                case SyntaxKind.TryExpression:
+                    return emitTryExpression(node as TryExpression);
                 case SyntaxKind.AwaitExpression:
                     return emitAwaitExpression(node as AwaitExpression);
                 case SyntaxKind.PrefixUnaryExpression:
@@ -2776,6 +2779,12 @@ export function createPrinter(printerOptions: PrinterOptions = {}, handlers: Pri
 
     function emitVoidExpression(node: VoidExpression) {
         emitTokenWithComment(SyntaxKind.VoidKeyword, node.pos, writeKeyword, node);
+        writeSpace();
+        emitExpression(node.expression, parenthesizer.parenthesizeOperandOfPrefixUnary);
+    }
+
+    function emitTryExpression(node: TryExpression) {
+        emitTokenWithComment(SyntaxKind.TryKeyword, node.pos, writeKeyword, node);
         writeSpace();
         emitExpression(node.expression, parenthesizer.parenthesizeOperandOfPrefixUnary);
     }

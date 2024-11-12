@@ -1150,6 +1150,12 @@ const visitEachChildTable: VisitEachChildTable = {
             Debug.checkDefined(nodeVisitor(node.expression, visitor, isExpression)),
         );
     },
+    [SyntaxKind.TryExpression]: function visitEachChildOfTryExpression(node, visitor, context, _nodesVisitor, nodeVisitor, _tokenVisitor) {
+        return context.factory.updateTryExpression(
+            node,
+            Debug.checkDefined(nodeVisitor(node.expression, visitor, isExpression)),
+        );
+    },
 
     [SyntaxKind.PrefixUnaryExpression]: function visitEachChildOfPrefixUnaryExpression(node, visitor, context, _nodesVisitor, nodeVisitor, _tokenVisitor) {
         return context.factory.updatePrefixUnaryExpression(

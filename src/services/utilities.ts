@@ -253,6 +253,7 @@ import {
     isTemplateLiteralKind,
     isToken,
     isTransientSymbol,
+    isTryExpression,
     isTypeAliasDeclaration,
     isTypeElement,
     isTypeNode,
@@ -1497,6 +1498,7 @@ function getAdjustedLocation(node: Node, forRename: boolean): Node {
         if (
             node.kind === SyntaxKind.NewKeyword && isNewExpression(parent) ||
             node.kind === SyntaxKind.VoidKeyword && isVoidExpression(parent) ||
+            node.kind === SyntaxKind.TryKeyword && isTryExpression(parent) ||
             node.kind === SyntaxKind.TypeOfKeyword && isTypeOfExpression(parent) ||
             node.kind === SyntaxKind.AwaitKeyword && isAwaitExpression(parent) ||
             node.kind === SyntaxKind.YieldKeyword && isYieldExpression(parent) ||

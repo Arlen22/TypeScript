@@ -288,6 +288,7 @@ export const enum SyntaxKind {
     DeleteExpression,
     TypeOfExpression,
     VoidExpression,
+    TryExpression,
     AwaitExpression,
     PrefixUnaryExpression,
     PostfixUnaryExpression,
@@ -1113,6 +1114,7 @@ export type HasChildren =
     | TypeOfExpression
     | VoidExpression
     | AwaitExpression
+    | TryExpression
     | PrefixUnaryExpression
     | PostfixUnaryExpression
     | BinaryExpression
@@ -2492,6 +2494,11 @@ export interface TypeOfExpression extends UnaryExpression {
 export interface VoidExpression extends UnaryExpression {
     readonly kind: SyntaxKind.VoidExpression;
     readonly expression: UnaryExpression;
+}
+
+export interface TryExpression extends Expression {
+    readonly kind: SyntaxKind.TryExpression;
+    readonly expression: Expression;
 }
 
 export interface AwaitExpression extends UnaryExpression {
@@ -5093,6 +5100,7 @@ export interface TypeChecker {
      * This is used to reflect the runtime behavior of the `await` keyword.
      */
     getAwaitedType(type: Type): Type | undefined;
+    getTryResultType(type: Type): Type | undefined;
     /** @internal */
     isEmptyAnonymousObjectType(type: Type): boolean;
     getReturnTypeOfSignature(signature: Signature): Type;
@@ -8904,6 +8912,8 @@ export interface NodeFactory {
     updateTypeOfExpression(node: TypeOfExpression, expression: Expression): TypeOfExpression;
     createVoidExpression(expression: Expression): VoidExpression;
     updateVoidExpression(node: VoidExpression, expression: Expression): VoidExpression;
+    createTryExpression(expression: Expression): TryExpression;
+    updateTryExpression(node: TryExpression, expression: Expression): TryExpression;
     createAwaitExpression(expression: Expression): AwaitExpression;
     updateAwaitExpression(node: AwaitExpression, expression: Expression): AwaitExpression;
     createPrefixUnaryExpression(operator: PrefixUnaryOperator, operand: Expression): PrefixUnaryExpression;

@@ -1,6 +1,13 @@
 /// <reference lib="decorators" />
 /// <reference lib="decorators.legacy" />
 
+type TryResult<T> = [undefined, T] | [TryError, undefined]
+
+declare class TryError<T = any> extends Error {
+  inner: T;
+  constructor(inner: T);
+}
+
 /////////////////////////////
 /// ECMAScript APIs
 /////////////////////////////

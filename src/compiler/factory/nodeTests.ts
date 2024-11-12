@@ -209,6 +209,7 @@ import {
     ThisTypeNode,
     ThrowStatement,
     Token,
+    TryExpression,
     TryStatement,
     TupleTypeNode,
     TypeAliasDeclaration,
@@ -627,6 +628,10 @@ export function isTypeOfExpression(node: Node): node is TypeOfExpression {
 
 export function isVoidExpression(node: Node): node is VoidExpression {
     return node.kind === SyntaxKind.VoidExpression;
+}
+
+export function isTryExpression(node: Node): node is TryExpression {
+    return node.kind === SyntaxKind.TryExpression;
 }
 
 export function isAwaitExpression(node: Node): node is AwaitExpression {

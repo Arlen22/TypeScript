@@ -175,6 +175,7 @@ export function getAllRules(): RuleSpec[] {
         rule("SpaceAfterBinaryKeywordOperator", binaryKeywordOperators, anyToken, [isNonJsxSameLineTokenContext, isBinaryOpContext], RuleAction.InsertSpace),
 
         rule("SpaceAfterVoidOperator", SyntaxKind.VoidKeyword, anyToken, [isNonJsxSameLineTokenContext, isVoidOpContext], RuleAction.InsertSpace),
+        rule("SpaceAfterTryOperator", SyntaxKind.TryKeyword, anyToken, [isNonJsxSameLineTokenContext, isTryExpressionContext], RuleAction.InsertSpace),
 
         // Async-await
         rule("SpaceBetweenAsyncAndOpenParen", SyntaxKind.AsyncKeyword, SyntaxKind.OpenParenToken, [isArrowFunctionContext, isNonJsxSameLineTokenContext], RuleAction.InsertSpace),
@@ -879,6 +880,10 @@ function isNonTypeAssertionContext(context: FormattingContext): boolean {
 
 function isVoidOpContext(context: FormattingContext): boolean {
     return context.currentTokenSpan.kind === SyntaxKind.VoidKeyword && context.currentTokenParent.kind === SyntaxKind.VoidExpression;
+}
+
+function isTryExpressionContext(context: FormattingContext): boolean {
+    return context.currentTokenSpan.kind === SyntaxKind.TryKeyword && context.currentTokenParent.kind === SyntaxKind.TryExpression;
 }
 
 function isYieldOrYieldStarWithOperand(context: FormattingContext): boolean {
