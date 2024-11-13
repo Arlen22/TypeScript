@@ -2,6 +2,19 @@
 /// <reference lib="decorators.legacy" />
 
 /////////////////////////////
+/// Arlen22 Fork Additions
+/////////////////////////////
+
+
+type TryResult<T> = [undefined, T] | [TryError, undefined]
+declare class TryError<T = any> extends Error {
+  inner: T;
+  constructor(inner: T);
+}
+
+
+
+/////////////////////////////
 /// ECMAScript APIs
 /////////////////////////////
 

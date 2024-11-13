@@ -295,6 +295,7 @@ export const enum SyntaxKind {
     ConditionalExpression,
     TemplateExpression,
     YieldExpression,
+    TryExpression,
     SpreadElement,
     ClassExpression,
     OmittedExpression,
@@ -1119,6 +1120,7 @@ export type HasChildren =
     | ConditionalExpression
     | TemplateExpression
     | YieldExpression
+    | TryExpression
     | SpreadElement
     | ClassExpression
     | ExpressionWithTypeArguments
@@ -2503,6 +2505,11 @@ export interface YieldExpression extends Expression {
     readonly kind: SyntaxKind.YieldExpression;
     readonly asteriskToken?: AsteriskToken;
     readonly expression?: Expression;
+}
+
+export interface TryExpression extends Expression {
+    readonly kind: SyntaxKind.TryExpression;
+    readonly expression: Expression;
 }
 
 export interface SyntheticExpression extends Expression {
@@ -5072,6 +5079,7 @@ export interface TypeChecker {
     getWidenedLiteralType(type: Type): Type;
     /** @internal */
     getPromisedTypeOfPromise(promise: Type, errorNode?: Node): Type | undefined;
+    getTryResultType(type: Type): Type | undefined;
     /**
      * Gets the "awaited type" of a type.
      *
@@ -8930,6 +8938,8 @@ export interface NodeFactory {
     createYieldExpression(asteriskToken: undefined, expression: Expression | undefined): YieldExpression;
     /** @internal */ createYieldExpression(asteriskToken: AsteriskToken | undefined, expression: Expression | undefined): YieldExpression; // eslint-disable-line @typescript-eslint/unified-signatures
     updateYieldExpression(node: YieldExpression, asteriskToken: AsteriskToken | undefined, expression: Expression | undefined): YieldExpression;
+    createTryExpression(expression: Expression): TryExpression;
+    updateTryExpression(node: TryExpression, expression: Expression): TryExpression;
     createSpreadElement(expression: Expression): SpreadElement;
     updateSpreadElement(node: SpreadElement, expression: Expression): SpreadElement;
     createClassExpression(modifiers: readonly ModifierLike[] | undefined, name: string | Identifier | undefined, typeParameters: readonly TypeParameterDeclaration[] | undefined, heritageClauses: readonly HeritageClause[] | undefined, members: readonly ClassElement[]): ClassExpression;

@@ -422,6 +422,7 @@ import {
     writeFile,
     WriteFileCallbackData,
     YieldExpression,
+    TryExpression,
 } from "./_namespaces/ts.js";
 import * as performance from "./_namespaces/ts.performance.js";
 
@@ -1962,6 +1963,8 @@ export function createPrinter(printerOptions: PrinterOptions = {}, handlers: Pri
                     return emitTemplateExpression(node as TemplateExpression);
                 case SyntaxKind.YieldExpression:
                     return emitYieldExpression(node as YieldExpression);
+                case SyntaxKind.TryExpression:
+                    return emitTryExpression(node as TryExpression);
                 case SyntaxKind.SpreadElement:
                     return emitSpreadElement(node as SpreadElement);
                 case SyntaxKind.ClassExpression:
@@ -2953,6 +2956,11 @@ export function createPrinter(printerOptions: PrinterOptions = {}, handlers: Pri
     function emitYieldExpression(node: YieldExpression) {
         emitTokenWithComment(SyntaxKind.YieldKeyword, node.pos, writeKeyword, node);
         emit(node.asteriskToken);
+        emitExpressionWithLeadingSpace(node.expression && parenthesizeExpressionForNoAsi(node.expression), parenthesizeExpressionForNoAsiAndDisallowedComma);
+    }
+
+    function emitTryExpression(node: TryExpression) {
+        emitTokenWithComment(SyntaxKind.TryKeyword, node.pos, writeKeyword, node);
         emitExpressionWithLeadingSpace(node.expression && parenthesizeExpressionForNoAsi(node.expression), parenthesizeExpressionForNoAsiAndDisallowedComma);
     }
 

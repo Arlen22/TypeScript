@@ -1201,6 +1201,13 @@ const visitEachChildTable: VisitEachChildTable = {
         );
     },
 
+    [SyntaxKind.TryExpression]: function visitEachChildOfTryExpression(node, visitor, context, _nodesVisitor, nodeVisitor, _tokenVisitor) {
+        return context.factory.updateTryExpression(
+            node,
+            Debug.checkDefined(nodeVisitor(node.expression, visitor, isExpression)),
+        );
+    },
+
     [SyntaxKind.SpreadElement]: function visitEachChildOfSpreadElement(node, visitor, context, _nodesVisitor, nodeVisitor, _tokenVisitor) {
         return context.factory.updateSpreadElement(
             node,

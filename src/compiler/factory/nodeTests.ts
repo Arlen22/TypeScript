@@ -209,6 +209,7 @@ import {
     ThisTypeNode,
     ThrowStatement,
     Token,
+    TryExpression,
     TryStatement,
     TupleTypeNode,
     TypeAliasDeclaration,
@@ -656,6 +657,11 @@ export function isTemplateExpression(node: Node): node is TemplateExpression {
 export function isYieldExpression(node: Node): node is YieldExpression {
     return node.kind === SyntaxKind.YieldExpression;
 }
+
+export function isTryExpression(node: Node): node is TryExpression {
+    return node.kind === SyntaxKind.TryExpression;
+}
+
 
 export function isSpreadElement(node: Node): node is SpreadElement {
     return node.kind === SyntaxKind.SpreadElement;

@@ -1132,6 +1132,8 @@ import {
     WithStatement,
     WriterContextOut,
     YieldExpression,
+    TryExpression,
+    isTryExpression,
 } from "./_namespaces/ts.js";
 import * as moduleSpecifiers from "./_namespaces/ts.moduleSpecifiers.js";
 import * as performance from "./_namespaces/ts.performance.js";
@@ -1651,6 +1653,7 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         getParameterIdentifierInfoAtPosition,
         getPromisedTypeOfPromise,
         getAwaitedType: type => getAwaitedType(type),
+        getTryResultType: type => getTryResultType(type),
         getReturnTypeOfSignature,
         isNullableType,
         getNullableType,
@@ -2274,6 +2277,7 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
     var deferredGlobalExtractSymbol: Symbol | undefined;
     var deferredGlobalOmitSymbol: Symbol | undefined;
     var deferredGlobalAwaitedSymbol: Symbol | undefined;
+    var deferredGlobalTryResultSymbol: Symbol | undefined;
     var deferredGlobalBigIntType: ObjectType | undefined;
     var deferredGlobalNaNSymbol: Symbol | undefined;
     var deferredGlobalRecordSymbol: Symbol | undefined;
@@ -17014,6 +17018,12 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         return deferredGlobalAwaitedSymbol === unknownSymbol ? undefined : deferredGlobalAwaitedSymbol;
     }
 
+    function getGlobalTryResultSymbol(reportErrors: boolean): Symbol | undefined {
+        // Only cache `unknownSymbol` if we are reporting errors so that we don't report the error more than once.
+        deferredGlobalTryResultSymbol ||= getGlobalTypeAliasSymbol("TryResult" as __String, /*arity*/ 1, reportErrors) || (reportErrors ? unknownSymbol : undefined);
+        return deferredGlobalTryResultSymbol === unknownSymbol ? undefined : deferredGlobalTryResultSymbol;
+    }
+
     function getGlobalBigIntType() {
         return (deferredGlobalBigIntType ||= getGlobalType("BigInt" as __String, /*arity*/ 0, /*reportErrors*/ false)) || emptyObjectType;
     }
@@ -31386,6 +31396,12 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         return undefined;
     }
 
+
+    function getContextualTypeForTryOperand(node: TryExpression, contextFlags: ContextFlags | undefined): Type | undefined {
+        const contextualType = getContextualType(node, contextFlags);
+        return contextualType && getTryResultType(contextualType);
+    }
+
     function getContextualTypeForAwaitOperand(node: AwaitExpression, contextFlags: ContextFlags | undefined): Type | undefined {
         const contextualType = getContextualType(node, contextFlags);
         if (contextualType) {
@@ -32133,6 +32149,8 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 return getContextualTypeForYieldOperand(parent as YieldExpression, contextFlags);
             case SyntaxKind.AwaitExpression:
                 return getContextualTypeForAwaitOperand(parent as AwaitExpression, contextFlags);
+            case SyntaxKind.TryExpression:
+                return getContextualTypeForTryOperand(parent as TryExpression, contextFlags);
             case SyntaxKind.CallExpression:
             case SyntaxKind.NewExpression:
                 return getContextualTypeForArgument(parent as CallExpression | NewExpression | Decorator, node);
@@ -39236,6 +39254,11 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         return hasError;
     }
 
+    function checkTryExpression(node: TryExpression): Type {
+        const operandType = checkExpression(node.expression);
+        return getTryResultType(operandType) ?? unknownType;
+    }
+
     function checkAwaitExpression(node: AwaitExpression): Type {
         addLazyDiagnostic(() => checkAwaitGrammar(node));
 
@@ -40973,6 +40996,10 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
             const type = getQuickTypeOfExpression(expr.expression);
             return type ? getAwaitedType(type) : undefined;
         }
+        if (isTryExpression(expr)) {
+            const type = getQuickTypeOfExpression(expr.expression);
+            return type ? getTryResultType(type) : undefined;
+        }
         // Optimize for the common case of a call to a function with a single non-generic call
         // signature where we can just fetch the return type without checking the arguments.
         if (isCallExpression(expr) && expr.expression.kind !== SyntaxKind.SuperKeyword && !isRequireCall(expr, /*requireStringLiteralLikeArgument*/ true) && !isSymbolOrSymbolForCall(expr)) {
@@ -41163,6 +41190,8 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 return checkVoidExpression(node as VoidExpression);
             case SyntaxKind.AwaitExpression:
                 return checkAwaitExpression(node as AwaitExpression);
+            case SyntaxKind.TryExpression:
+                return checkTryExpression(node as TryExpression);
             case SyntaxKind.PrefixUnaryExpression:
                 return checkPrefixUnaryExpression(node as PrefixUnaryExpression);
             case SyntaxKind.PostfixUnaryExpression:
@@ -42643,6 +42672,12 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                     return Debug.failBadSyntaxKind(d);
             }
         }
+    }
+
+    function getTryResultType(type: Type, errorNode?: Node, diagnosticMessage?: DiagnosticMessage, ...args: DiagnosticArguments) {
+        // Nothing to do if `TryResult<T>` doesn't exist
+        const tryresultSymbol = getGlobalTryResultSymbol(/*reportErrors*/ true);
+        return tryresultSymbol && getTypeAliasInstantiation(tryresultSymbol, [type])
     }
 
     function getAwaitedTypeOfPromise(type: Type, errorNode?: Node, diagnosticMessage?: DiagnosticMessage, ...args: DiagnosticArguments): Type | undefined {

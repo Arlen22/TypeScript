@@ -2,7 +2,7 @@
     "name": "typescript",
     "author": "Microsoft Corp.",
     "homepage": "https://www.typescriptlang.org/",
-    "version": "5.8.0",
+    "version": "5.8.0-arlen22-0.2",
     "license": "Apache-2.0",
     "description": "TypeScript is a language for application scale JavaScript development",
     "keywords": [
@@ -99,7 +99,8 @@
         "lint": "hereby lint",
         "knip": "hereby knip",
         "format": "dprint fmt",
-        "setup-hooks": "node scripts/link-hooks.mjs"
+        "setup-hooks": "node scripts/link-hooks.mjs",
+        "pack": "hereby local && hereby LKG && hereby clean"
     },
     "browser": {
         "fs": false,

@@ -431,6 +431,7 @@ import {
     TokenFlags,
     TransformFlags,
     TrueLiteral,
+    TryExpression,
     TryStatement,
     TupleTypeNode,
     Type,
@@ -684,6 +685,8 @@ export function createNodeFactory(flags: NodeFactoryFlags, baseFactory: BaseNode
         createTemplateLiteralLikeNode,
         createYieldExpression,
         updateYieldExpression,
+        createTryExpression,
+        updateTryExpression,
         createSpreadElement,
         updateSpreadElement,
         createClassExpression,
@@ -3626,6 +3629,22 @@ export function createNodeFactory(flags: NodeFactoryFlags, baseFactory: BaseNode
         return node.expression !== expression
                 || node.asteriskToken !== asteriskToken
             ? update(createYieldExpression(asteriskToken, expression), node)
+            : node;
+    }
+
+    
+    // @api
+    function createTryExpression(expression: Expression): TryExpression {
+        const node = createBaseNode<TryExpression>(SyntaxKind.TryExpression);
+        node.expression = expression && parenthesizerRules().parenthesizeExpressionForDisallowedComma(expression);
+        node.transformFlags |= propagateChildFlags(node.expression);
+        return node;
+    }
+
+    // @api
+    function updateTryExpression(node: TryExpression, expression: Expression) {
+        return node.expression !== expression
+            ? update(createTryExpression(expression), node)
             : node;
     }
 
