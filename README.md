@@ -6,6 +6,7 @@ This fork contains a few modifications to Typescript to preview the try-expressi
 
 - Create a new npm project folder using `npm init`.
 - `npm install` the built tgz file from the releases page of this repository.
+  - https://github.com/Arlen22/TypeScript/releases/download/arlen22-dev-0.2/typescript-5.8.0-arlen22-0.2.tgz
 - In VSCode, create a new typescript file and open it to enable the Typescript engine, then run the command "Typescript: Select Typescript Version" and select the version from your node_modules folder.
 - Create a tsconfig.json file with `strictNullChecks` enabled.
 - If you run `tsc` it will just pass the syntax through to the Javascript file.
