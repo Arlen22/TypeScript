@@ -1,16 +1,10 @@
 /// <reference lib="decorators" />
 /// <reference lib="decorators.legacy" />
+/// <reference path="./lib.arlen22.d.ts" />
 
 /////////////////////////////
 /// Arlen22 Fork Additions
 /////////////////////////////
-
-
-type TryResult<T> = [undefined, T] | [TryError, undefined]
-declare class TryError<T = any> extends Error {
-  inner: T;
-  constructor(inner: T);
-}
 
 
 

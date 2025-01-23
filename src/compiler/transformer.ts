@@ -72,6 +72,7 @@ import {
     transformSystemModule,
     transformTypeScript,
     VariableDeclaration,
+    transformTryExpression,
 } from "./_namespaces/ts.js";
 import * as performance from "./_namespaces/ts.performance.js";
 
@@ -142,6 +143,8 @@ function getScriptTransformers(compilerOptions: CompilerOptions, customTransform
         transformers.push(transformJsx);
     }
 
+    transformers.push(transformTryExpression);
+
     if (languageVersion < ScriptTarget.ESNext) {
         transformers.push(transformESNext);
     }
@@ -180,6 +183,8 @@ function getScriptTransformers(compilerOptions: CompilerOptions, customTransform
         transformers.push(transformES2015);
         transformers.push(transformGenerators);
     }
+
+
 
     transformers.push(getModuleTransformer(moduleKind));
 
