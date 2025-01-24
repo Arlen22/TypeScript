@@ -8,5 +8,8 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "file:../typescript-5.8.0-arlen22-0.2.tgz"
+  }
 }
