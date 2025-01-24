@@ -101,7 +101,7 @@
         "format": "dprint fmt",
         "setup-hooks": "node scripts/link-hooks.mjs",
         "pack": "hereby local && hereby LKG && hereby clean",
-        "build:dev": "npm run pack && npm pack && (cd example/ && npm install ../typescript-5.8.0-arlen22-0.2.tgz)",
+        "build:dev": "npm run pack && npm pack && (cd example/ && npm install ../typescript-5.8.0-arlen22-0.3.tgz)",
         "install:dev": "mkdir -p example && cd example/ && npm init -y"
     },
     "browser": {
