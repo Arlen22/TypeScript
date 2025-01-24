@@ -559,6 +559,7 @@ import {
     TransientSymbol,
     TriviaSyntaxKind,
     tryCast,
+    TryExpression,
     tryRemovePrefix,
     TryStatement,
     TsConfigSourceFile,
@@ -2501,9 +2502,10 @@ export function getErrorSpanForNode(sourceFile: SourceFile, node: Node): TextSpa
             const end = (node as CaseOrDefaultClause).statements.length > 0 ? (node as CaseOrDefaultClause).statements[0].pos : (node as CaseOrDefaultClause).end;
             return createTextSpanFromBounds(start, end);
         }
+        case SyntaxKind.TryExpression:
         case SyntaxKind.ReturnStatement:
         case SyntaxKind.YieldExpression: {
-            const pos = skipTrivia(sourceFile.text, (node as ReturnStatement | YieldExpression).pos);
+            const pos = skipTrivia(sourceFile.text, (node as ReturnStatement | YieldExpression | TryExpression).pos);
             return getSpanOfTokenAtPosition(sourceFile, pos);
         }
         case SyntaxKind.SatisfiesExpression: {
@@ -3587,6 +3589,7 @@ export function isExpressionNode(node: Node): boolean {
         case SyntaxKind.JsxFragment:
         case SyntaxKind.YieldExpression:
         case SyntaxKind.AwaitExpression:
+        case SyntaxKind.TryExpression:
         case SyntaxKind.MetaProperty:
             return true;
         case SyntaxKind.ExpressionWithTypeArguments:
@@ -5558,6 +5561,7 @@ export function getOperatorAssociativity(kind: SyntaxKind, operator: SyntaxKind,
         case SyntaxKind.DeleteExpression:
         case SyntaxKind.AwaitExpression:
         case SyntaxKind.ConditionalExpression:
+        case SyntaxKind.TryExpression:
         case SyntaxKind.YieldExpression:
             return Associativity.Right;
 
@@ -5634,6 +5638,13 @@ export const enum OperatorPrecedence {
     //     `yield` AssignmentExpression
     //     `yield` `*` AssignmentExpression
     Yield,
+
+    // NOTE: `Yield` and `Try` should have the same precedence
+    // AssignmentExpression: TryExpression
+    // TryExpression:
+    //     `try` AssignmentExpression
+    TryExpression,
+    
 
     // AssignmentExpression: LeftHandSideExpression `=` AssignmentExpression
     // AssignmentExpression: LeftHandSideExpression AssignmentOperator AssignmentExpression
@@ -5809,6 +5820,9 @@ export function getOperatorPrecedence(nodeKind: SyntaxKind, operatorKind: Syntax
 
         case SyntaxKind.YieldExpression:
             return OperatorPrecedence.Yield;
+
+        case SyntaxKind.TryExpression:
+            return OperatorPrecedence.TryExpression;
 
         case SyntaxKind.ConditionalExpression:
             return OperatorPrecedence.Conditional;

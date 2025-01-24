@@ -2082,6 +2082,7 @@ function isExpressionKind(kind: SyntaxKind): boolean {
     switch (kind) {
         case SyntaxKind.ConditionalExpression:
         case SyntaxKind.YieldExpression:
+        case SyntaxKind.TryExpression:
         case SyntaxKind.ArrowFunction:
         case SyntaxKind.BinaryExpression:
         case SyntaxKind.SpreadElement:
