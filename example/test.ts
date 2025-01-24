@@ -1,54 +1,38 @@
 export { };
 
-function* test() {
-  try {
-    const test2 = yield (yield fetch("url")).json()
-    console.log("success")
-  } catch (e) {
-    console.log("failed");
-  }
-  console.log("continue");
+
+
+
+async function examples() {
+  // array.map((fn) => try fn()).filter((result) => result.ok);
+  const data = {} as any;
+  const expr1 = Promise.resolve("hello");
+  const expr2 = Promise.resolve("world");
+  const check = true;
+  let result;
+  result = try expr1; // literally any expression
+  result = try expr1 || expr2; // the try covers both, same as an arrow function body
+  result = try check ? expr1 : expr2; // try covers the entire expression
+  result = try expr1 ?? expr2; // again covers the entire expression
+  result = try data?.someProperty.anotherFunction?.(await fetch("")).andAnotherOne()
+  result = try await fetch("https://api.example.com/data", { headers: {} })
+  result = try (await expr1, await expr2); // covers all, returning the last one
+  result = try ({ "my": await expr1 }); // convers everything inside the object
+  result = try [await (await fetch("")).json(), expr1, expr2]; // covers everything inside the array
+  // result = try this.test = this.test2 = await fetch(""); // covers everything
 }
-
-async function tester(arg: any) {
-  try {
-    // const test2 = try await (await fetch("")).json();
-    // const test3 = try JSON.parse();
-    // const test2 = await (async () => { try { return await (await fetch("")).json(); } catch (e) { return e; } })();
-    // const test3 = (() => { try { return JSON.parse(); } catch (e) { return e; } })();
-    console.log("it worked");
-  } catch (e) {
-    console.log("it didn't")
-  }
-  console.log("keep going");
-}
-
-
-
-// async function examples() {
-//   array.map((fn) => try fn()).filter((result) => result.ok);
-//   let result;
-//   result = try expr1; // literally any expression
-//   result = try data?.someProperty.anotherFunction?.(await someData()).andAnotherOne()
-//   result = try await fetch("https://api.example.com/data", { headers: {} })
-//   result = try expression1 || expression2; // the try covers both, same as an arrow function body
-//   result = try check ? expression1 : expression2; // try covers the entire expression
-//   result = try expression1 ?? expresssion2; // again covers the entire expression
-//   result = try (expression1, expression2); // covers all, returning the last one
-//   result = try ({ "my": await fetch() }); // convers everything inside the object
-//   result = try [await (await fetch()).json(), expression1, anythingelse]; // covers everything inside the array
-//   result = try this.test = this.test2 = await fetch(); // covers everything
-// }
 
 async function* examples2() {
-  // function test2() { console.log(arguments) }
+
   const expression = "hello";
+  console.log(try expression);
   console.log(try await expression);
   console.log(try yield expression);
   console.log(try yield await expression);
   console.log(yield try expression);
   console.log(yield try await expression);
   console.log(yield try yield await expression);
+  const result = try expression;
   await Promise.resolve("hello");
 }
 
