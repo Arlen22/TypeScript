@@ -20,6 +20,24 @@ async function examples() {
   result = try ({ "my": await expr1 }); // convers everything inside the object
   result = try [await (await fetch("")).json(), expr1, expr2]; // covers everything inside the array
   // result = try this.test = this.test2 = await fetch(""); // covers everything
+
+  const test = try await createUser((try await (await fetch("")).json() as {hello: true}).value)
+
+  // const exprsync = try expr1;
+  const exprsync = try expr1;
+  // const exprasync = try await expr1;
+  const exprasync = try await expr1;
+  // const expryield = try yield expr1;
+  const expryield = try yield expr1;
+  // const expryieldasync = try yield await expr1;
+  const expryieldasync = try yield await expr1;
+  // const exprsyncyield = yield try expr1;
+  const exprsyncyield = yield try expr1;
+  // const exprsyncyieldasync = yield try await expr1;
+  const exprsyncyieldasync = yield try await expr1;
+  // const expryieldyieldasync = yield try yield await expr1;
+  const expryieldyieldasync = yield try yield await expr1;
+
 }
 
 async function* examples2() {

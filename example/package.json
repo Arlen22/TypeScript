@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc test.ts --target esnext"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "typescript": "file:../typescript-5.8.0-arlen22-0.2.tgz"
+    "typescript": "https://github.com/Arlen22/TypeScript/releases/download/arlen22-dev-0.3/typescript-5.8.0-arlen22-0.3.tgz"
   }
 }
