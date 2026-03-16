@@ -1,0 +1,7 @@
+{
+  "name": "try-examples",
+  "private": true,
+  "dependencies": {
+    "typescript":"../typescript-5.9.3-try.tgz"
+  }
+}

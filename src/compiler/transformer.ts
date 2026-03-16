@@ -70,6 +70,7 @@ import {
     transformLegacyDecorators,
     transformModule,
     transformSystemModule,
+    transformTryExpression,
     transformTypeScript,
     VariableDeclaration,
 } from "./_namespaces/ts.js";
@@ -143,6 +144,8 @@ function getScriptTransformers(compilerOptions: CompilerOptions, customTransform
     if (getJSXTransformEnabled(compilerOptions)) {
         transformers.push(transformJsx);
     }
+
+    transformers.push(transformTryExpression);
 
     if (languageVersion < ScriptTarget.ESNext) {
         transformers.push(transformESNext);

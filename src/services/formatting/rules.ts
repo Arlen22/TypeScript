@@ -165,6 +165,8 @@ export function getAllRules(): RuleSpec[] {
         rule("NoSpaceBetweenYieldKeywordAndStar", SyntaxKind.YieldKeyword, SyntaxKind.AsteriskToken, [isNonJsxSameLineTokenContext, isYieldOrYieldStarWithOperand], RuleAction.DeleteSpace),
         rule("SpaceBetweenYieldOrYieldStarAndOperand", [SyntaxKind.YieldKeyword, SyntaxKind.AsteriskToken], anyToken, [isNonJsxSameLineTokenContext, isYieldOrYieldStarWithOperand], RuleAction.InsertSpace),
 
+        rule("SpaceBetweenTryAndOperand", [SyntaxKind.TryKeyword], anyToken, [isNonJsxSameLineTokenContext, isTryExpression], RuleAction.InsertSpace),
+
         rule("NoSpaceBetweenReturnAndSemicolon", SyntaxKind.ReturnKeyword, SyntaxKind.SemicolonToken, [isNonJsxSameLineTokenContext], RuleAction.DeleteSpace),
         rule("SpaceAfterCertainKeywords", [SyntaxKind.VarKeyword, SyntaxKind.ThrowKeyword, SyntaxKind.NewKeyword, SyntaxKind.DeleteKeyword, SyntaxKind.ReturnKeyword, SyntaxKind.TypeOfKeyword, SyntaxKind.AwaitKeyword], anyToken, [isNonJsxSameLineTokenContext], RuleAction.InsertSpace),
         rule("SpaceAfterLetConstInVariableDeclaration", [SyntaxKind.LetKeyword, SyntaxKind.ConstKeyword], anyToken, [isNonJsxSameLineTokenContext, isStartOfVariableDeclarationList], RuleAction.InsertSpace),
@@ -883,6 +885,10 @@ function isVoidOpContext(context: FormattingContext): boolean {
 
 function isYieldOrYieldStarWithOperand(context: FormattingContext): boolean {
     return context.contextNode.kind === SyntaxKind.YieldExpression && (context.contextNode as YieldExpression).expression !== undefined;
+}
+
+function isTryExpression(context: FormattingContext): boolean {
+    return context.contextNode.kind === SyntaxKind.TryExpression;
 }
 
 function isNonNullAssertionContext(context: FormattingContext): boolean {

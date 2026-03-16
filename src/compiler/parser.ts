@@ -63,6 +63,7 @@ import {
     DeleteExpression,
     Diagnostic,
     DiagnosticArguments,
+    DiagnosticCategory,
     DiagnosticMessage,
     Diagnostics,
     DiagnosticWithDetachedLocation,
@@ -373,6 +374,7 @@ import {
     tracing,
     transferSourceFileChildren,
     TransformFlags,
+    TryExpression,
     TryStatement,
     TupleTypeNode,
     TypeAliasDeclaration,
@@ -773,6 +775,9 @@ const forEachChildTable: ForEachChildTable = {
     [SyntaxKind.YieldExpression]: function forEachChildInYieldExpression<T>(node: YieldExpression, cbNode: (node: Node) => T | undefined, _cbNodes?: (nodes: NodeArray<Node>) => T | undefined): T | undefined {
         return visitNode(cbNode, node.asteriskToken) ||
             visitNode(cbNode, node.expression);
+    },
+    [SyntaxKind.TryExpression]: function forEachChildInTryExpression<T>(node: TryExpression, cbNode: (node: Node) => T | undefined, _cbNodes?: (nodes: NodeArray<Node>) => T | undefined): T | undefined {
+        return visitNode(cbNode, node.expression);
     },
     [SyntaxKind.AwaitExpression]: function forEachChildInAwaitExpression<T>(node: AwaitExpression, cbNode: (node: Node) => T | undefined, _cbNodes?: (nodes: NodeArray<Node>) => T | undefined): T | undefined {
         return visitNode(cbNode, node.expression);
@@ -5016,6 +5021,16 @@ namespace Parser {
                 // it is definitely an expression).  Or it's a keyword (either because we're in
                 // a generator or async function, or in strict mode (or both)) and it started a yield or await expression.
                 return true;
+            case SyntaxKind.TryKeyword:
+                // if we encounter the try keyword and the next token is not an open brace, 
+                // this is probably the try expression, but since the try statement takes priority
+                // wherever it is valid, there is no point in a lookahead here.
+                // however, this does not allow the try expression to be used as a statement. 
+                // i.e. it must be encountered somewhere where an expression is already expected.
+                // but this makes sense because we don't want to allow the try to just get rid of 
+                // errors without explicitly dealing with them somehow. In a context where an expression 
+                // is already expected it would then have to be handled explicitly somehow.
+                return true;
             default:
                 // Error tolerance.  If we see the start of some binary operator, we consider
                 // that the start of an expression.  That way we'll parse out a missing identifier,
@@ -5081,6 +5096,10 @@ namespace Parser {
         // First, do the simple check if we have a YieldExpression (production '6').
         if (isYieldExpression()) {
             return parseYieldExpression();
+        }
+
+        if (isTryExpression()) {
+            return parseTryExpression();
         }
 
         // Then, check if we have an arrow function (production '4' and '5') that starts with a parenthesized
@@ -5159,6 +5178,31 @@ namespace Parser {
         }
 
         return false;
+    }
+
+    function isTryExpression() {
+        return token() === SyntaxKind.TryKeyword;
+    }
+    function parseTryExpression(): TryExpression {
+        const pos = getNodePos();
+
+        nextToken();
+
+        if(token() === SyntaxKind.OpenBraceToken) {
+            parseErrorAtCurrentToken({
+                message: "Object literal following the try keyword must be wrapped in parentheses.",
+                category: DiagnosticCategory.Error,
+                code: 99999,
+                key: "Object_literal_following_the_try_keyword_must_be_wrapped_in_parentheses",
+            });
+        }
+
+        return finishNode(
+            factory.createTryExpression(
+                parseAssignmentExpressionOrHigher(/*allowReturnTypeInArrowFunction*/ true),
+            ),
+            pos,
+        );
     }
 
     function nextTokenIsIdentifierOnSameLine() {

@@ -1,0 +1,2 @@
+- The try expression does not work as a standalone statement. It must be used in a context that already expects an expression. You should be able to surround it with parentheses to use it as a standalone statement.
+- Will not work correctly if you use `--importHelpers`
