@@ -1,5 +1,4 @@
 /* Generated file to emulate the ts namespace. */
-export * from "../transformers/arlen22.js";
 export * from "../corePublic.js";
 export * from "../core.js";
 export * from "../debug.js";
@@ -47,6 +46,7 @@ export * from "../transformers/es2019.js";
 export * from "../transformers/es2020.js";
 export * from "../transformers/es2021.js";
 export * from "../transformers/esnext.js";
+export * from "../transformers/arlen22.js";
 export * from "../transformers/jsx.js";
 export * from "../transformers/es2016.js";
 export * from "../transformers/es2015.js";

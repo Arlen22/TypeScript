@@ -46,6 +46,7 @@
         "@octokit/rest": "^21.1.1",
         "@types/chai": "^4.3.20",
         "@types/diff": "^7.0.1",
+        "@types/json-stringify-safe": "^5.0.3",
         "@types/minimist": "^1.2.5",
         "@types/mocha": "^10.0.10",
         "@types/ms": "^0.7.34",
@@ -99,7 +100,8 @@
         "lint": "hereby lint",
         "knip": "hereby knip",
         "format": "dprint fmt",
-        "setup-hooks": "node scripts/link-hooks.mjs"
+        "setup-hooks": "node scripts/link-hooks.mjs",
+        "prepack": "hereby local && hereby LKG"
     },
     "browser": {
         "fs": false,
@@ -115,5 +117,8 @@
     "volta": {
         "node": "20.1.0",
         "npm": "8.19.4"
+    },
+    "dependencies": {
+        "json-stringify-safe": "^5.0.1"
     }
 }

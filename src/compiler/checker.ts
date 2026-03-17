@@ -2255,6 +2255,8 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
     var globalThisType: GenericType;
     var anyArrayType: Type;
     var autoArrayType: Type;
+    var globalIndexedIterableType: GenericType;
+    var anyIndexedIterableType: Type;
     var anyReadonlyArrayType: Type;
     var deferredGlobalNonNullableTypeAlias: Symbol;
 
@@ -11622,21 +11624,41 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         return reference ? getFlowTypeOfReference(reference, declaredType) : declaredType;
     }
 
-    function getSyntheticElementAccess(node: BindingElement | PropertyAssignment | ShorthandPropertyAssignment | Expression): ElementAccessExpression | undefined {
+    function getSyntheticElementAccess(node: BindingElement | PropertyAssignment | ShorthandPropertyAssignment | Expression, symbolName?: string): ElementAccessExpression | undefined {
         const parentAccess = getParentElementAccess(node);
         if (parentAccess && canHaveFlowNode(parentAccess) && parentAccess.flowNode) {
             const propName = getDestructuringPropertyName(node);
             if (propName) {
-                const literal = setTextRangeWorker(parseNodeFactory.createStringLiteral(propName), node);
-                const lhsExpr = isLeftHandSideExpression(parentAccess) ? parentAccess : parseNodeFactory.createParenthesizedExpression(parentAccess);
-                const result = setTextRangeWorker(parseNodeFactory.createElementAccessExpression(lhsExpr, literal), node);
-                setParent(literal, result);
-                setParent(result, node);
-                if (lhsExpr !== parentAccess) {
-                    setParent(lhsExpr, result);
+                if(symbolName){
+                    const symbolIdent = setTextRangeWorker(parseNodeFactory.createPropertyAccessExpression(
+                        setTextRangeWorker(parseNodeFactory.createIdentifier("Symbol"), node),
+                        setTextRangeWorker(parseNodeFactory.createIdentifier(symbolName), node),
+                    ), node);
+                    const literal = setTextRangeWorker(parseNodeFactory.createStringLiteral(propName), node);
+                    const lhsExpr = isLeftHandSideExpression(parentAccess) ? parentAccess : parseNodeFactory.createParenthesizedExpression(parentAccess);
+                    const symbolAccess = setTextRangeWorker(parseNodeFactory.createElementAccessExpression(lhsExpr, symbolIdent), node)
+                    const result = setTextRangeWorker(parseNodeFactory.createElementAccessExpression(symbolAccess, literal), node)
+                    setParent(symbolIdent, symbolAccess);
+                    setParent(literal, result);
+                    setParent(symbolAccess, result);
+                    setParent(result, node);
+                    if (lhsExpr !== parentAccess) {
+                        setParent(lhsExpr, symbolAccess);
+                    }
+                    result.flowNode = parentAccess.flowNode;
+                    return result;
+                } else {
+                    const literal = setTextRangeWorker(parseNodeFactory.createStringLiteral(propName), node);
+                    const lhsExpr = isLeftHandSideExpression(parentAccess) ? parentAccess : parseNodeFactory.createParenthesizedExpression(parentAccess);
+                    const result = setTextRangeWorker(parseNodeFactory.createElementAccessExpression(lhsExpr, literal), node);
+                    setParent(literal, result);
+                    setParent(result, node);
+                    if (lhsExpr !== parentAccess) {
+                        setParent(lhsExpr, result);
+                    }
+                    result.flowNode = parentAccess.flowNode;
+                    return result;
                 }
-                result.flowNode = parentAccess.flowNode;
-                return result;
             }
         }
     }
@@ -11738,6 +11760,11 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
                 const indexType = getNumberLiteralType(index);
                 const declaredType = getIndexedAccessTypeOrUndefined(parentType, indexType, accessFlags, declaration.name) || errorType;
                 type = getFlowTypeOfDestructuring(declaration, declaredType);
+            }
+            else if (isIndexedIterableLikeType(parentType)) {
+                const indexType = getNumberLiteralType(index);
+                const declaredType = getIndexedAccessTypeOrUndefined(parentType, indexType, accessFlags, declaration.name);
+                type = declaredType ? getFlowTypeOfDestructuring(declaration, declaredType) : elementType;
             }
             else {
                 type = elementType;
@@ -25455,6 +25482,15 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
         // A type is array-like if it is a reference to the global Array or global ReadonlyArray type,
         // or if it is not the undefined or null type and if it is assignable to ReadonlyArray<any>
         return isArrayType(type) || !(type.flags & TypeFlags.Nullable) && isTypeAssignableTo(type, anyReadonlyArrayType);
+    }
+    function isIndexedIterableType(type: Type): boolean {
+        return !!(getObjectFlags(type) & ObjectFlags.Reference)
+            && (type as TypeReference).target === globalIndexedIterableType;
+    }
+    function isIndexedIterableLikeType(type: Type): boolean {
+        return isArrayLikeType(type)
+            || isIndexedIterableType(type)
+            || !(type.flags & TypeFlags.Nullable) && isTypeAssignableTo(type, anyIndexedIterableType);
     }
 
     function isMutableArrayLikeType(type: Type): boolean {
@@ -51406,6 +51442,8 @@ export function createTypeChecker(host: TypeCheckerHost): TypeChecker {
 
         globalReadonlyArrayType = getGlobalTypeOrUndefined("ReadonlyArray" as __String, /*arity*/ 1) as GenericType || globalArrayType;
         anyReadonlyArrayType = globalReadonlyArrayType ? createTypeFromGenericGlobalType(globalReadonlyArrayType, [anyType]) : anyArrayType;
+        globalIndexedIterableType = getGlobalTypeOrUndefined("IndexedIterable" as __String, /*arity*/ 1) as GenericType || globalArrayType;
+        anyIndexedIterableType = globalIndexedIterableType ? createTypeFromGenericGlobalType(globalIndexedIterableType, [anyType]) : anyReadonlyArrayType;
         globalThisType = getGlobalTypeOrUndefined("ThisType" as __String, /*arity*/ 1) as GenericType;
 
         if (augmentations) {
