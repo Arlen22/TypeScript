@@ -13,6 +13,7 @@
         "es2023",
         "es2024",
         "esnext",
+        "arlen22",
         // Host only
         "dom.generated",
         "dom.iterable.generated",

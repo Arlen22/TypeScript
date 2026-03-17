@@ -2,6 +2,9 @@
   "name": "try-examples",
   "private": true,
   "dependencies": {
-    "typescript":"../typescript-5.9.3-try.tgz"
+    "typescript": "file:../typescript-5.9.3-try.tgz"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
   }
 }

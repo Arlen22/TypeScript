@@ -164,6 +164,7 @@ const libEntries: [string, string][] = [
     ["es2023", "lib.es2023.d.ts"],
     ["es2024", "lib.es2024.d.ts"],
     ["esnext", "lib.esnext.d.ts"],
+    ["arlen22", "lib.arlen22.d.ts"],
     // Host only
     ["dom", "lib.dom.d.ts"],
     ["dom.iterable", "lib.dom.iterable.d.ts"],
